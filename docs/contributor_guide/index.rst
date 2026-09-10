@@ -140,8 +140,8 @@ Publish Changes
 ------------------
 
 Most contributions will change files in the code or the documentation directory, as described in the
-sections below. Commit your changes to a separate *git* branch (do **not** commit to ``master``).
-After changing, push this branch to Github and open a pull request to the ``master`` branch there.
+sections below. Commit your changes to a separate *git* branch (do **not** commit to ``main``).
+After changing, push this branch to Github and open a pull request to the ``main`` branch there.
 Once the request is opened, automated tests are run.
 If these tests indicate a problem, you can fix this problem on your branch and push again.
 Once the automated tests are successful, maintainers of ``cblearn`` will review the changes and provide feedback.
