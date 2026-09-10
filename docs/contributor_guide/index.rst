@@ -154,8 +154,72 @@ Usually, after some iterations, your changes will be merged into the ``main`` br
 .. _this open source license: https://github.com/cblearn/cblearn/blob/main/LICENSE
 
 
-Versions should be semantic and follow PIP440_: The version indicates ``major.minor.fix``;
-breaking changes are just allowed with major version steps.
-A Github release tag indicates a new version, which triggers a continuous deployment to PyPI via Github Actions.
+---------------------
+Release a New Version
+---------------------
+
+Versions are semantic and follow PIP440_: the version indicates ``major.minor.fix``.
+Breaking changes are only allowed with major version steps.
+
+The version number is not stored anywhere in the repository.
+It is derived from the git tag by *versioneer*, so creating the tag is the version bump.
+The examples below release the version ``0.4.0``; replace it with the version you release.
+
+.. warning::
+
+    Uploads to PyPI are immutable. A published version cannot be replaced or
+    uploaded again, not even after deleting it. A mistake has to be corrected
+    by releasing a new fix version.
+
+1. **Prepare the release in a pull request.** Add a section for the new version to
+   ``CHANGELOG.md``, and update the metadata in ``setup.cfg`` if the maintainers or
+   the supported Python versions changed.
+
+2. **Merge the pull request and wait for the tests on** ``main``. The release workflow
+   builds and uploads, but it does not run the test suite. The tests in ``test.yml``
+   are the gate.
+
+   .. note::
+
+       Directly after the merge, a workflow run named "Release" appears and succeeds.
+       It did not publish anything. That workflow runs on every push to ``main``,
+       but its upload steps only run for tags.
+
+3. **Create the tag.** The tag is the version itself, without a ``v`` prefix, because
+   ``tag_prefix`` is empty in the *versioneer* configuration:
+
+   .. code-block:: bash
+
+       git switch main
+       git pull
+       git tag 0.4.0
+       git push origin 0.4.0
+
+   Alternatively, Github can create the tag in the next step.
+
+4. **Publish a Github release** for the tag at
+   https://github.com/cblearn/cblearn/releases/new. Use the version as the title
+   and the new ``CHANGELOG.md`` section as the description.
+
+   .. note::
+
+       Publishing the release is what triggers the deployment. Pushing the tag alone
+       does not, because the workflow reacts to published releases and to pushes on
+       ``main``, but not to pushed tags.
+
+5. **Watch the deployment** in the Actions tab of the repository. The workflow uploads
+   to TestPyPI first and to PyPI afterwards.
+
+6. **Verify the published package** in a fresh environment:
+
+   .. code-block:: bash
+
+       python -m venv cbtest
+       cbtest/bin/pip install cblearn==0.4.0
+       cbtest/bin/python -c "import cblearn; print(cblearn.__version__)"
+
+   The printed version has to be exactly the tag. A ``+`` suffix or ``0+unknown``
+   means that *versioneer* did not find the tag, and the upload has to be corrected
+   by releasing a new fix version.
 
 .. _PIP440: https://peps.python.org/pep-0440/
